@@ -1,88 +1,50 @@
-function cmdArguments()
-{
-	
+function args()
+{ 
+	this._args = window.arguments[0].QueryInterface(Components.interfaces.nsICommandLine);
+	this.getArg = function(arg)
+	{
+		var arg = this._args.handleFlagWithParam(arg,false);	
+		return (arg != -1)?arg:null;
+	}	
 }
 
-
-function config()
-{
-	this.cmd_args = window.arguments[0].QueryInterface(Components.interfaces.nsICommandLine);
-	this.tmp_rel_path = "../www/xulrunner-app-grab-preview/myapp/tmp";
-}
-
-
-
-var conf = new config();
+var tmp_rel_path = "D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
 
 function app()
+{ 
+	this.g_args = new args();
+	this._url = this.g_args.getArg("url");
+	this._width = this.g_args.getArg("width");
+	this._height = this.g_args.getArg("height");
+}
+
+app.prototype = 
 {
-	this.url = "";	
+	_url: null,
+	getUrl: function(){ return this._url;},
+	setUrl: function(val){ this._url = val;},
+	getWidth: function(){ return this._width;},
+	setWidth: function(val){ this._width = val;},
+	getHeight: function(){ return this._height;},
+	setHeight: function(val){ this._height = val;}	
 }
 
 var this_app = new app();
 
 function snapThat()
 {
-	this_app.url = conf.cmd_args.handleFlagWithParam("args",false);
-	this_app.
-	//printWithCanvas();
+	getBrowser().loadURI(this_app.getUrl());
+	//getBrowser().addProgressListener();
+	setTimeout(printWithCanvas, 5000);
 }
 
-function outputFilePath(aMode) {
-  var path = (window.arguments && window.arguments[2])?
-               window.arguments[2] : "";
-  if (path)
-    return path;
-
-  var prefs = Components.classes["@mozilla.org/preferences;1"]
-                        .getService(Components.interfaces.nsIPrefBranch);
-  	
-  var fileLeaf = "";
-  try {
-    fileLeaf = prefs.getComplexValue("extensions.cmdlnprint.basefilename",
-                                      Components.interfaces.nsISupportsString)
-                    .data;
-    if (!fileLeaf)
-      fileLeaf = "snapshot.%EXT%";
-      
-    var title = getBrowser().contentDocument.title;
-    if (title.length > 32)
-      title = title.substring(0, 32);
-
-    fileLeaf = fileLeaf.replace("%HOST%", getBrowser().currentURI.host);
-    fileLeaf = fileLeaf.replace("%TITLE%", title);
-    fileLeaf = fileLeaf.replace("%DATE%", dateString());
-
-    var ext = "dat";
-
-    switch (aMode) {
-    case 1:
-      ext = "pdf";
-      break;
-    case 2:
-      ext = "png";
-      break;
-    case 3:
-      ext = "ps";
-      break;
-    }
-
-    fileLeaf = fileLeaf.replace("%EXT%", ext);
-
-    /* forbidden letters, as title can be contain any letters. */
-    while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
-      fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
-
-  }
-  catch(e) {
-    fileLeaf = "foo";
-  }
-
-  var file = Components.classes["@mozilla.org/download-manager;1"]
-                       .getService(Components.interfaces.nsIDownloadManager)
-                       .userDownloadsDirectory;
-  file.append(fileLeaf);
-  return file.path;
+function outputFilePath() {
+	var d = new Date();
+	var fileLeaf = this_app.getUrl()+"_"+d.getTime()+".png";
+	while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
+	fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
+	var path = tmp_rel_path+"\\"+fileLeaf;  
+	return path;
 }
 
 
@@ -122,7 +84,7 @@ function printWithCanvas() {
                  "rgb(128,128,128)");
   ctx.restore();
 //  document.documentElement.appendChild(canvas);
-  savePNG(canvas, outputFilePath(2));
+  savePNG(canvas, outputFilePath());
 }
 
 
@@ -189,4 +151,8 @@ function savePNG(aCanvas, aPath) {
   
   persist.progressListener = gPrintProgressListener;
   persist.saveURI(source, null, null, null, null, file);
+}
+
+function getBrowser() {
+  return document.getElementById("content");
 }
