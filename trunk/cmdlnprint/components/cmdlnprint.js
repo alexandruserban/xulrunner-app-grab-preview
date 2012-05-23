@@ -3,7 +3,7 @@ const COMPONENT_CID = Components.ID("{80edd604-4028-4c89-a1c1-6e1f25bfa5a2}");
 const COMPONENT_PRETTY_NAME = "Print Command Handler";
 const COMPONENT_CATEGORY_ENTRY = "m-printjob";
 const err_log = function(err){Components.utils.reportError(err);};
-err_log("asdasadasdasdasdasdasd");
+
 function openWindow(aParent, aURL, aTarget, aFeatures, aArgs) {
   var args = Components.classes["@mozilla.org/supports-array;1"]
                        .createInstance(Components.interfaces.nsICollection);

@@ -333,9 +333,8 @@ function delayedPrintPageShow() {
 }
 
 function delayedShutdown() {
-  window.setTimeout(window.close, 100);
+  //window.setTimeout(window.close, 100);
 }
-
 
 function getBrowser() {
   return document.getElementById("content");
