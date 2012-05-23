@@ -2,7 +2,7 @@
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<window id="main" onload="crap()" title="My App" width="300" height="300" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<window id="main" onload="snapThat()"  title="My App" width="300" height="300" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script type="application/javascript" src="chrome://myapp/content/main.js"/>
 
@@ -11,6 +11,14 @@
   <button label="More >>" oncommand="showMore();"/>
   <separator/>
   <description id="more-text" hidden="true">This is a simple XULRunner application. XUL is simple to use and quite powerful and can even be used on mobile devices.</description>
-
+  <browser id="content"
+           type="content-primary"
+           name="content"
+           src="about:blank"
+           flex="1"
+           disablehistory="true"
+           style="min-height : 600px; min-width : 800px;"
+           onclick="event.preventDefault();"
+           />
 </window>
 
