@@ -9,6 +9,10 @@ function args()
 		return (arg != -1)?arg:null;
 	}	
 }
+function getHostname(str) {
+	var re = new RegExp('^(?:f|ht)tp(?:s)?\://([^/]+)', 'im');
+	return str.match(re)[1].toString();
+	}
 
 var progressListener = { 
 	stateIsRequest:false,
@@ -29,15 +33,15 @@ var progressListener = {
 	},
 	onProgressChange : function(a,b,c,d,e,f){},
 	onStatusChange : function(a,b,c,d){ 
-	
-		// if(c == "2152398854" && d.indexOf())//transfering data
-		// {
-			// var da = new Date();
-			// if(parseInt(da.getTime()-start_time) > wait_time)
-			// {
-				// printWithCanvas();
-			// }
-		// }
+		alert(d.indexOf(getHostname(this_app.getUrl())));
+		if(c == "2152398854" && d.indexOf(getHostname(this_app.getUrl())))//transfering data
+		{
+			var da = new Date();
+			if(parseInt(da.getTime()-start_time) > wait_time)
+			{
+				printWithCanvas();
+			}
+		}
 	},
 	onSecurityChange : function(a,b,c){},
 	onLinkIconAvailable : function(a){} 
