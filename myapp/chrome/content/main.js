@@ -8,45 +8,32 @@ function args()
 	}	
 }
 
-var tmp_rel_path = "D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
+var progressListener = { 
+	stateIsRequest:false,
+	QueryInterface : function(aIID) {
+		if (aIID.equals(Components.interfaces.nsIWebProgressListener) ||
+			aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+			aIID.equals(Components.interfaces.nsISupports))
+				return this;
+		throw Components.results.NS_NOINTERFACE;
+	},
+	onStateChange : function(aProgress,aRequest,aFlag,aStatus) 
+	{ 	
+		if(aStatus > 0)
+		{
+							
+		};
+		return 0;
+	},
 
-function app()
-{ 
-	this.g_args = new args();
-	this._url = this.g_args.getArg("url");
-	this._width = this.g_args.getArg("width");
-	this._height = this.g_args.getArg("height");
-}
-
-app.prototype = 
-{
-	_url: null,
-	getUrl: function(){ return this._url;},
-	setUrl: function(val){ this._url = val;},
-	getWidth: function(){ return this._width;},
-	setWidth: function(val){ this._width = val;},
-	getHeight: function(){ return this._height;},
-	setHeight: function(val){ this._height = val;}	
-}
-
-var this_app = new app();
-
-function snapThat()
-{
-	getBrowser().loadURI(this_app.getUrl());
-	//getBrowser().addProgressListener();
-	setTimeout(printWithCanvas, 5000);
-}
-
-function outputFilePath() {
-	var d = new Date();
-	var fileLeaf = this_app.getUrl()+"_"+d.getTime()+".png";
-	while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
-	fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
-	var path = tmp_rel_path+"\\"+fileLeaf;  
-	return path;
-}
-
+	onLocationChange : function(aProgress,aRequest,aLocation) {
+		return 0;
+	},
+	onProgressChange : function(a,b,c,d,e,f){},
+	onStatusChange : function(a,b,c,d){ },
+	onSecurityChange : function(a,b,c){},
+	onLinkIconAvailable : function(a){} 
+};
 
 function printWithCanvas() {
   var canvas = document.createElementNS("http://www.w3.org/1999/xhtml",
@@ -86,8 +73,54 @@ function printWithCanvas() {
 //  document.documentElement.appendChild(canvas);
   savePNG(canvas, outputFilePath());
 }
+	
+var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
+var wait_time = 10000;//wait 10 seconds for the page to load
+//const nsIWebProgressListener = Components.classes["@mozilla.org/login-manager;1"].getService(Components.interfaces.nsIWebProgressListener);
+
+function app()
+{ 
+	this.g_args = new args();
+	this._url = this.g_args.getArg("url");
+	this._width = this.g_args.getArg("width");
+	this._height = this.g_args.getArg("height");
+}
+
+app.prototype = 
+{
+	_url: null,
+	getUrl: function(){ return this._url;},
+	setUrl: function(val){ this._url = val;},
+	getWidth: function(){ return this._width;},
+	setWidth: function(val){ this._width = val;},
+	getHeight: function(){ return this._height;},
+	setHeight: function(val){ this._height = val;}	
+}
+
+var this_app = new app();
+
+function snapThat()
+{
+	getBrowser().loadURI(this_app.getUrl());
+	window.resizeTo(this_app.getWidth(),this_app.getHeight());
+	setTimeout(printWithCanvas,wait_time);
+	//getBrowser().addProgressListener(progressListener)
+}
+
+function outputFilePath() {
+	var d = new Date();
+	var fileLeaf = this_app.getUrl()+"_"+d.getTime()+".png";
+	while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
+	fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
+	var path = tmp_rel_path+"\\"+fileLeaf;  
+	return path;
+}
 
 
+function delayedShutdown() {
+  window.close();
+}
+	
 var gPrintProgressListener = {
   onStateChange : function (aWebProgress,
                             aRequest,
@@ -124,10 +157,6 @@ var gPrintProgressListener = {
   }
 };
 
-function delayedShutdown() {
-  window.setTimeout(window.close, 100);
-}
-
 function savePNG(aCanvas, aPath) {
   var file = Components.classes["@mozilla.org/file/local;1"]
                        .createInstance(Components.interfaces.nsILocalFile);
@@ -143,12 +172,12 @@ function savePNG(aCanvas, aPath) {
     Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"]
               .createInstance(Components.interfaces.nsIWebBrowserPersist);
   
-  persist.persistFlags =
+  persist.persistFlags = 
     Components.interfaces.nsIWebBrowserPersist
               .PERSIST_FLAGS_REPLACE_EXISTING_FILES |
     Components.interfaces.nsIWebBrowserPersist
               .PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
-  
+			
   persist.progressListener = gPrintProgressListener;
   persist.saveURI(source, null, null, null, null, file);
 }

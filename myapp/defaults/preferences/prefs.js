@@ -1,5 +1,6 @@
 pref("toolkit.defaultChromeURI", "chrome://myapp/content/main.xul");
 pref("browser.cache.disk.enable", false);
+pref("toolkit.singletonWindowType", 'multiple_windows');//main _window
 /* reload xpcom comp */
 pref("xpinstall.dialog.confirm", "chrome://mozapps/content/xpinstall/xpinstallConfirm.xul");
 pref("xpinstall.dialog.progress.skin", "chrome://mozapps/content/extensions/extensions.xul?type=themes");
