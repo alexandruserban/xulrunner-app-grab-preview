@@ -1,3 +1,5 @@
+
+
 function args()
 { 
 	this._args = window.arguments[0].QueryInterface(Components.interfaces.nsICommandLine);
@@ -19,10 +21,6 @@ var progressListener = {
 	},
 	onStateChange : function(aProgress,aRequest,aFlag,aStatus) 
 	{ 	
-		if(aStatus > 0)
-		{
-							
-		};
 		return 0;
 	},
 
@@ -30,7 +28,17 @@ var progressListener = {
 		return 0;
 	},
 	onProgressChange : function(a,b,c,d,e,f){},
-	onStatusChange : function(a,b,c,d){ },
+	onStatusChange : function(a,b,c,d){ 
+	
+		// if(c == "2152398854" && d.indexOf())//transfering data
+		// {
+			// var da = new Date();
+			// if(parseInt(da.getTime()-start_time) > wait_time)
+			// {
+				// printWithCanvas();
+			// }
+		// }
+	},
 	onSecurityChange : function(a,b,c){},
 	onLinkIconAvailable : function(a){} 
 };
@@ -74,13 +82,14 @@ function printWithCanvas() {
   savePNG(canvas, outputFilePath());
 }
 	
-var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
-var wait_time = 10000;//wait 10 seconds for the page to load
+var gg_args = new args();
 //const nsIWebProgressListener = Components.classes["@mozilla.org/login-manager;1"].getService(Components.interfaces.nsIWebProgressListener);
+var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
+var wait_time = 10000*gg_args.getArg("time");//wait 10 seconds for the page to load
 
 function app()
 { 
-	this.g_args = new args();
+	this.g_args = gg_args;
 	this._url = this.g_args.getArg("url");
 	this._width = this.g_args.getArg("width");
 	this._height = this.g_args.getArg("height");
@@ -98,6 +107,8 @@ app.prototype =
 }
 
 var this_app = new app();
+var start_date = new Date();
+var start_time = start_date.getTime();
 
 function snapThat()
 {
@@ -108,8 +119,8 @@ function snapThat()
 }
 
 function outputFilePath() {
-	var d = new Date();
-	var fileLeaf = this_app.getUrl()+"_"+d.getTime()+".png";
+	
+	var fileLeaf = this_app.getUrl()+"_"+start_date.getTime()+".png";
 	while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
 	fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
 	var path = tmp_rel_path+"\\"+fileLeaf;  
