@@ -1,5 +1,3 @@
-
-
 function args()
 { 
 	this._args = window.arguments[0].QueryInterface(Components.interfaces.nsICommandLine);
@@ -9,10 +7,11 @@ function args()
 		return (arg != -1)?arg:null;
 	}	
 }
+
 function getHostname(str) {
 	var re = new RegExp('^(?:f|ht)tp(?:s)?\://([^/]+)', 'im');
 	return str.match(re)[1].toString();
-	}
+}
 
 var progressListener = { 
 	stateIsRequest:false,
@@ -33,7 +32,7 @@ var progressListener = {
 	},
 	onProgressChange : function(a,b,c,d,e,f){},
 	onStatusChange : function(a,b,c,d){ 
-		alert(d.indexOf(getHostname(this_app.getUrl())));
+		
 		if(c == "2152398854" && d.indexOf(getHostname(this_app.getUrl())))//transfering data
 		{
 			var da = new Date();
@@ -88,8 +87,9 @@ function printWithCanvas() {
 	
 var gg_args = new args();
 //const nsIWebProgressListener = Components.classes["@mozilla.org/login-manager;1"].getService(Components.interfaces.nsIWebProgressListener);
-var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
-var wait_time = 10000*gg_args.getArg("time");//wait 10 seconds for the page to load
+//var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
+var tmp_rel_path = "D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
+var wait_time = 20000//gg_args.getArg("time");//wait 15 seconds for the page to load
 
 function app()
 { 
@@ -97,6 +97,7 @@ function app()
 	this._url = this.g_args.getArg("url");
 	this._width = this.g_args.getArg("width");
 	this._height = this.g_args.getArg("height");
+	this._name = this.g_args.getArg("name");
 }
 
 app.prototype = 
@@ -107,7 +108,8 @@ app.prototype =
 	getWidth: function(){ return this._width;},
 	setWidth: function(val){ this._width = val;},
 	getHeight: function(){ return this._height;},
-	setHeight: function(val){ this._height = val;}	
+	setHeight: function(val){ this._height = val;},	
+	getName: function(){ return this._name;}	
 }
 
 var this_app = new app();
@@ -124,9 +126,14 @@ function snapThat()
 
 function outputFilePath() {
 	
-	var fileLeaf = this_app.getUrl()+"_"+start_date.getTime()+".png";
-	while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
-	fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
+	var fileLeaf = this_app.getName();
+	if(!fileLeaf)
+	{
+		fileLeaf = this_app.getUrl()+"_"+start_date.getTime()+".png";
+		while (/[\\\/\:\?\*\"\<\>\|]/.test(fileLeaf))
+		fileLeaf = fileLeaf.replace(/[\\\/\:\?\*\"\<\>\|]/g, "_");
+	}
+	
 	var path = tmp_rel_path+"\\"+fileLeaf;  
 	return path;
 }
@@ -199,4 +206,22 @@ function savePNG(aCanvas, aPath) {
 
 function getBrowser() {
   return document.getElementById("content");
+}
+
+
+
+/* logging */
+function saveToLog(data) {
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+	file.initWithPath("D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\log\\log.txt");
+	
+	if ( file.exists() == false ) {
+		  alert("File does not exist");
+	}
+	
+	foStream.init(file, 0x02 | 0x10, 00666, 0);
+	foStream.write(data,data.length);
+	foStream.close();
+	alert(1);
 }
