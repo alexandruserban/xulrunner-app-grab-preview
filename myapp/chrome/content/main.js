@@ -24,6 +24,7 @@ var progressListener = {
 	},
 	onStateChange : function(aProgress,aRequest,aFlag,aStatus) 
 	{ 	
+		
 		return 0;
 	},
 
@@ -32,17 +33,9 @@ var progressListener = {
 	},
 	onProgressChange : function(a,b,c,d,e,f){},
 	onStatusChange : function(a,b,c,d){ 
-		
-		if(c == "2152398854" && d.indexOf(getHostname(this_app.getUrl())))//transfering data
-		{
-			var da = new Date();
-			if(parseInt(da.getTime()-start_time) > wait_time)
-			{
-				printWithCanvas();
-			}
-		}
+		page_loading++;
 	},
-	onSecurityChange : function(a,b,c){},
+	onSecurityChange : function(a,b,c){page_loading++},
 	onLinkIconAvailable : function(a){} 
 };
 
@@ -84,12 +77,34 @@ function printWithCanvas() {
 //  document.documentElement.appendChild(canvas);
   savePNG(canvas, outputFilePath());
 }
-	
+
+
+function pageLoading()
+{
+	middle_time = new Date();middle_time=middle_time.getTime();
+	if(page_loaded == page_loading || middle_time-start_time>wait_time)
+	{
+		page_completed_loading = true;
+		clearTimeout(check_if_page_completed_loading);
+		printWithCanvas();
+	}
+	else
+	{	
+		page_loaded = page_loading;
+		check_if_page_completed_loading = setTimeout("pageLoading()",wait_time_recall);
+	}	
+}
+
+var middle_time = {};
+var end_time = {};
+var wait_time_recall = 2500;
+var check_if_page_completed_loading = setTimeout("pageLoading()",wait_time_recall);
+var page_loading = 0;	
+var page_loaded = 0;	
+var page_completed_loading = false;	
 var gg_args = new args();
-//const nsIWebProgressListener = Components.classes["@mozilla.org/login-manager;1"].getService(Components.interfaces.nsIWebProgressListener);
-//var tmp_rel_path = "D:\\workspace\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
 var tmp_rel_path = "D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\tmp";
-var wait_time = 20000//gg_args.getArg("time");//wait 15 seconds for the page to load
+var wait_time = 60000;
 
 function app()
 { 
@@ -120,8 +135,8 @@ function snapThat()
 {
 	getBrowser().loadURI(this_app.getUrl());
 	window.resizeTo(this_app.getWidth(),this_app.getHeight());
-	setTimeout(printWithCanvas,wait_time);
-	//getBrowser().addProgressListener(progressListener)
+	//setTimeout(printWithCanvas,wait_time);
+	getBrowser().addProgressListener(progressListener)
 }
 
 function outputFilePath() {
@@ -202,6 +217,8 @@ function savePNG(aCanvas, aPath) {
 			
   persist.progressListener = gPrintProgressListener;
   persist.saveURI(source, null, null, null, null, file);
+  end_time = new Date();end_time=end_time.getTime();
+  //alert(end_time-start_time);
 }
 
 function getBrowser() {
@@ -211,7 +228,7 @@ function getBrowser() {
 
 
 /* logging */
-function saveToLog(data) {
+function writeToLog(data) {
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
 	file.initWithPath("D:\\web thingies\\wamp\\www\\xulrunner-app-grab-preview\\myapp\\log\\log.txt");
@@ -223,5 +240,5 @@ function saveToLog(data) {
 	foStream.init(file, 0x02 | 0x10, 00666, 0);
 	foStream.write(data,data.length);
 	foStream.close();
-	alert(1);
+
 }
